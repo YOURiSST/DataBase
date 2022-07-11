@@ -76,7 +76,7 @@ private:
         if (cur) {
             clear(cur->next);
         }
-        delete *cur;
+        delete cur;
     }
 
 
@@ -119,7 +119,7 @@ public:
 
         for (Node<K, V> * cur = head; cur != nullptr; cur = cur->next) {
             if (cur->key == key) {
-                return {cur->val, cur->key};
+                return {cur->key, cur->val};
             }
         }
     }
@@ -173,10 +173,25 @@ private:
     Bucket<K, V> * table;
     std::hash<K> hashGenerator;
 
+    void rehash() {
+        std::vector< std::pair<K, V> > tableInfo;
+        for (auto i : *this) {
+            tableInfo.template emplace_back(i);
+        }
+        for (int bucket = 0; bucket < module; ++bucket) {
+            table[bucket].clear();
+        }
+        delete[] table;
+        module = 4 * numOfKeys;
+        table = new Bucket<K, V>[module];
+        for (auto [key, val] : tableInfo) {
+            Insert(key, val);
+        }
+    }
 
 public:
     HashTable() {
-        module = 1e6 + 3;
+        module = 1;
         table = new Bucket<K, V>[module];
     }
 
@@ -189,19 +204,29 @@ public:
         return hashGenerator(key) % module;
     }
 
-    void Get(const K& key) {
+    V& Get(const K& key) {
         int bucketInd = hashFunction(key);
-
+        try {
+            return table[bucketInd].Get(key).second;
+        } catch (const std::invalid_argument& e) {
+            std::cerr << e.what() << std::endl;
+        }
     }
 
     void Insert (const K& key, const V& value) {
-
         int bucketInd = hashFunction(key);
         if (table[bucketInd].Find(key) != std::nullopt) {
             throw std::logic_error("you cant add key, that is being used");
         }
         table[bucketInd].PushFront(key, value);
         numOfKeys++;
+        if (numOfKeys * 2 >= module) {
+            rehash();
+        }
+    }
+
+    void Info() {
+        std::cerr << module << "\n";
     }
 
     class iterator {
@@ -287,6 +312,9 @@ public:
     iterator end() {
         return iterator(table, module, 0, module);
     }
+
+
+
 
 };
 }
