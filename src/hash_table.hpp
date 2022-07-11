@@ -59,14 +59,26 @@ private:
     int numOfKeys = 0;
     friend class HashTable<K, V>;
 
-    std::pair<K, V> * GetBucket() {
+    /*std::pair<K, V> * GetBucket() {
         std::pair<K, V> * bucketInfo = new std::pair<K, V>[numOfKeys];
         int i = 0;
         for (Node<K, V> * cur = head; cur != nullptr; cur = cur->next, ++i) {
             bucketInfo[i] = {cur->key, cur->val};
         }
         return bucketInfo;
+    }*/
+
+    void clear() {
+        clear(head);
     }
+
+    void clear(Node<K, V> * cur) {
+        if (cur) {
+            clear(cur->next);
+        }
+        delete *cur;
+    }
+
 
 public:
     Bucket() {
@@ -78,6 +90,10 @@ public:
     }
 
     void PushFront(const K& key, const V& val) {
+
+        if (Find(key) != std::nullopt) {
+            throw std::logic_error("you cant add key, that is being used");
+        }
         Node<K, V>* temp = head;
         head = new Node(key, val);
         head->next = temp;
@@ -94,6 +110,18 @@ public:
         }
 
         return std::nullopt;
+    }
+
+    std::pair<K, V&> Get(const K& key) {
+        if (!Find(key)) {
+            throw std::invalid_argument("there is no key like this");
+        }
+
+        for (Node<K, V> * cur = head; cur != nullptr; cur = cur->next) {
+            if (cur->key == key) {
+                return {cur->val, cur->key};
+            }
+        }
     }
 
     std::optional<V> Erase(const K& key) {
@@ -122,6 +150,18 @@ public:
         return std::nullopt;
     }
 
+    std::pair<K, V&> GetByIndex(int index) {
+        if (index >= numOfKeys) {
+            throw std::out_of_range("index is greater than numOfKeys in this bucket");
+        }
+        int i = 0;
+        auto cur = head;
+        while (i != index) {
+            cur = cur->next;
+            ++i;
+        }
+        return {cur->key, cur->val};
+    };
 
 };
 
@@ -149,22 +189,12 @@ public:
         return hashGenerator(key) % module;
     }
 
+    void Get(const K& key) {
+        int bucketInd = hashFunction(key);
 
-
-    std::pair < std::pair<K, V> * , int > GetMas() {
-        std::pair<K, V> * tableInfo = new std::pair<K, V>[numOfKeys];
-        int i = 0;
-        for (int currentBucket = 0; currentBucket < module; ++currentBucket) {
-            std::pair<K, V> * curBucketInfo = table[currentBucket].GetBucket(); // !!!!
-            for (int j = 0; j < table[currentBucket].numOfKeys; ++j) {
-                tableInfo[i++] = curBucketInfo[j];
-            }
-        }
-        return {tableInfo, numOfKeys};
     }
 
-
-    void Insert0 (const K& key, const V& value) {
+    void Insert (const K& key, const V& value) {
 
         int bucketInd = hashFunction(key);
         table[bucketInd].PushFront(key, value);
@@ -176,16 +206,59 @@ public:
         Bucket<K, V> * table;
         int bucketNumber;
         int nodeNumber;
-        iterator(Bucket<K, V> * table_, int bucketNumber_, int nodeNumber_) {
+        int module;
+
+    public:
+        iterator(Bucket<K, V> * table_, int bucketNumber_, int nodeNumber_, int module_) {
             table = table_;
             bucketNumber = bucketNumber_;
             nodeNumber = nodeNumber_;
+            module = module_;
         }
 
         std::pair<K, V&> operator *() {
-
+            return table[bucketNumber].GetByIndex(nodeNumber);
         }
+
+        bool IsValid() {
+            return !table[bucketNumber].IsEmpty();
+        }
+
+        iterator& operator ++() {
+            if (table[bucketNumber].numOfKeys > nodeNumber + 1) {
+                nodeNumber++;
+                return *this;
+            }
+            nodeNumber = 0;
+            while (bucketNumber != module && table[bucketNumber].IsEmpty()) {
+                bucketNumber++;
+            }
+            return *this;
+        }
+
+        bool operator == (const iterator& other) const {
+            return table == other.table && bucketNumber == other.bucketNumber &&
+                    nodeNumber == other.nodeNumber;
+        }
+
+        bool operator != (const iterator& other) const {
+            return table != other.table || bucketNumber != other.bucketNumber ||
+            nodeNumber != other.nodeNumber;
+        }
+
     };
+    iterator begin() {
+        iterator toReturn = iterator(table, 0, 0, module);
+        if (toReturn.IsValid()) {
+            return toReturn;
+        }
+        toReturn++;
+        return toReturn;
+    }
+
+    iterator end() {
+        return iterator(table, module, 0, module);
+    }
 
 };
 }
