@@ -55,6 +55,11 @@ signed main() {
 
 
 
+
+
+
+
+
 template <typename T1, typename T2>
 std::ostream& operator << (std::ostream& out, std::pair<T1, T2> p) {
     out << '{' << p.first << ", " << p.second << '}';
@@ -100,3 +105,6 @@ signed main() {
 
     return 0;
 }
+
+
+

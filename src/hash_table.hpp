@@ -86,7 +86,7 @@ public:
             throw std::logic_error("you cant add key, that is being used");
         }
         Node<K, V>* temp = head;
-        head = new Node(key, val);
+        head = new Node<K, V>(key, val);
         head->next = temp;
         ++numOfKeys;
     }
