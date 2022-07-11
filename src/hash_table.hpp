@@ -197,6 +197,9 @@ public:
     void Insert (const K& key, const V& value) {
 
         int bucketInd = hashFunction(key);
+        if (table[bucketInd].Find(key) != std::nullopt) {
+            throw std::logic_error("you cant add key, that is being used");
+        }
         table[bucketInd].PushFront(key, value);
         numOfKeys++;
     }
@@ -225,16 +228,41 @@ public:
         }
 
         iterator& operator ++() {
+
             if (table[bucketNumber].numOfKeys > nodeNumber + 1) {
                 nodeNumber++;
                 return *this;
             }
             nodeNumber = 0;
-            while (bucketNumber != module && table[bucketNumber].IsEmpty()) {
+            if (bucketNumber == module) { return *this; };
+            do {
                 bucketNumber++;
-            }
+            } while (bucketNumber != module && table[bucketNumber].IsEmpty());
             return *this;
         }
+
+        iterator operator ++(int)  {
+            iterator temp = *this;
+            bool stop = false;
+            if (table[bucketNumber].numOfKeys > nodeNumber + 1) {
+                nodeNumber++;
+                stop = true;
+            }
+            if (bucketNumber == module) { stop = true; }
+            nodeNumber = 0;
+            if (!stop) {
+                do {
+                    bucketNumber++;
+                } while (bucketNumber != module && table[bucketNumber].IsEmpty());
+            }
+            return temp;
+        }
+
+
+        void Info() {
+            std::cout << bucketNumber << " " << nodeNumber;
+        }
+
 
         bool operator == (const iterator& other) const {
             return table == other.table && bucketNumber == other.bucketNumber &&
