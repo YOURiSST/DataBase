@@ -59,15 +59,6 @@ private:
     int numOfKeys = 0;
     friend class HashTable<K, V>;
 
-    /*std::pair<K, V> * GetBucket() {
-        std::pair<K, V> * bucketInfo = new std::pair<K, V>[numOfKeys];
-        int i = 0;
-        for (Node<K, V> * cur = head; cur != nullptr; cur = cur->next, ++i) {
-            bucketInfo[i] = {cur->key, cur->val};
-        }
-        return bucketInfo;
-    }*/
-
     void clear() {
         clear(head);
     }
@@ -326,6 +317,28 @@ public:
     std::pair<int, int> Info() {
         return {numOfKeys, module};
     }
+
+    std::string FastCheck(int mod) {
+        if (mod == -1)
+            mod = module;
+        int empty = 0;
+        int full = 0;
+        int totalkeys = 0;
+        for (int i = 0; i < mod; ++i) {
+            if (table[i].IsEmpty()) {
+                empty++;
+                continue;
+            }
+            full++;
+            totalkeys += table[i].numOfKeys;
+
+        }
+        std::cout << "\n\n\n" << "empty: " <<  empty << " full: " << full << " totalKeys: " << totalkeys <<
+            " totalBuckets: " << module << " \n\n\n";
+        return "~~done~~\n";
+
+    }
+
 };
 
 }

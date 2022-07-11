@@ -14,9 +14,9 @@ signed main() {
 
     myTable.Insert(1, 5);
     myTable.Insert(3, 5);
-    myTable.Insert(25, -129);
+    myTable.Insert(-25, -129);
     myTable.Insert(2, 1);
-    myTable.Insert(32, 1);
+    myTable.Insert(-32, 1);
     myTable.Insert(20, 29302);
 
     {
@@ -30,7 +30,7 @@ signed main() {
     }
 
 
-    myTable.Erase(32);
+    myTable.Erase(-32);
     {
         std::cout << "\n=================\n\n";
         std::cout << myTable.Info() << std::endl;
@@ -40,6 +40,8 @@ signed main() {
         }
         std::cout << "\n------------------\n\n";
     }
+
+    //myTable.FastCheck(-1);
 
     return 0;
 }
