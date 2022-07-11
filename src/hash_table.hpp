@@ -122,6 +122,7 @@ public:
                 return {cur->key, cur->val};
             }
         }
+
     }
 
     std::optional<V> Erase(const K& key) {
@@ -173,10 +174,12 @@ private:
     Bucket<K, V> * table;
     std::hash<K> hashGenerator;
 
-    void rehash() {
+
+
+    void Rehash() {
         std::vector< std::pair<K, V> > tableInfo;
         for (auto i : *this) {
-            tableInfo.template emplace_back(i);
+            tableInfo.emplace_back(i);
         }
         for (int bucket = 0; bucket < module; ++bucket) {
             table[bucket].clear();
@@ -221,8 +224,17 @@ public:
         table[bucketInd].PushFront(key, value);
         numOfKeys++;
         if (numOfKeys * 2 >= module) {
-            rehash();
+            Rehash();
         }
+    }
+
+    V Erase(const K& key) {
+        int bucketInd = hashFunction(key);
+        auto ret = table[bucketInd].Erase(key);
+        if (ret == std::nullopt) {
+            throw std::invalid_argument("there is no key like this");
+        }
+        return ret.value();
     }
 
     void Info() {
