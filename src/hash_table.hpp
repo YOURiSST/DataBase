@@ -178,6 +178,7 @@ private:
 
     void Rehash() {
         std::vector< std::pair<K, V> > tableInfo;
+        std::cerr << numOfKeys << " ";
         for (auto i : *this) {
             tableInfo.emplace_back(i);
         }
@@ -187,6 +188,7 @@ private:
         delete[] table;
         module = 4 * numOfKeys;
         table = new Bucket<K, V>[module];
+        numOfKeys = 0;
         for (auto [key, val] : tableInfo) {
             Insert(key, val);
         }
@@ -209,11 +211,9 @@ public:
 
     V& Get(const K& key) {
         int bucketInd = hashFunction(key);
-        try {
-            return table[bucketInd].Get(key).second;
-        } catch (const std::invalid_argument& e) {
-            std::cerr << e.what() << std::endl;
-        }
+
+        return table[bucketInd].Get(key).second;
+
     }
 
     void Insert (const K& key, const V& value) {
@@ -234,12 +234,10 @@ public:
         if (ret == std::nullopt) {
             throw std::invalid_argument("there is no key like this");
         }
+        --numOfKeys;
         return ret.value();
     }
 
-    void Info() {
-        std::cerr << module << "\n";
-    }
 
     class iterator {
     private:
@@ -325,37 +323,10 @@ public:
         return iterator(table, module, 0, module);
     }
 
-
-
-
+    std::pair<int, int> Info() {
+        return {numOfKeys, module};
+    }
 };
+
 }
 
-
-/*signed main() {
-    Bucket<int, int> bucket;
-    HashTable<string, int> tabla;
-    //cout << tabla.hashFunction("abacaba") << endl;
-
-
-    tabla.Insert("andsk", 4);
-    tabla.Insert("dskl", 1);
-    tabla.Insert("fkdlkfd", 439);
-
-    {
-        auto [a, b] = tabla.GetMas();
-        for (int i = 0; i < b; ++i) {
-            cout << a[i] << endl;
-        }
-    }
-
-
-
-    {
-        auto [a, b] = tabla.GetMas();
-        for (int i = 0; i < b; ++i) {
-            cout << a[i] << endl;
-        }
-    }
-    return 0;
-}*/
