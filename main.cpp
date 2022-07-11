@@ -8,5 +8,6 @@ signed main() {
     for (int i = 0; i < 10; ++i) {
         std::cout << 4 << " ";
     }
+
     return 0;
 }

@@ -19,9 +19,6 @@
 
 #include "primes.h"
 
-void wow() {
-    int a = 5;
-}
 namespace hash_table {
 
 template <typename K, typename V>
