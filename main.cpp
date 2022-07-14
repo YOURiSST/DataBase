@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <fstream>
 #include "src/hash_table.hpp"
 
 hash_table::HashTable<std::string, long long> table;
@@ -9,6 +10,8 @@ std::string GET = "GET";
 std::string ERASE = "ERASE";
 std::string INC = "INC";
 std::string CHG = "CHG";
+std::string YES = "Y";
+std::string NO = "N";
 
 void faq() {
     std::cout << "======================================================================\n"
@@ -25,8 +28,28 @@ void faq() {
 
 }
 
+void dump() {
+    std::fstream outStream;
+    outStream.open("TableInfo.dat", std::fstream::out);
+/*    if (!outStream.is_open()) {
+        std::cout << "An error occured while opening the file\n";
+        return;
+    }*/
+    for (auto  [key, value] : table) {
+        outStream << key << " " << value << std::endl;
+    }
+
+    std::cout << "Move your .dat file to a secure place. It is temporary";
+}
+
 void bye() {
-    //cout << "wanna dump your Base? y - yes, n - no\n"
+    std::string answer;
+    std::cout << "Wanna dump your Base? y - yes, n - no\n";
+    std::cin >> answer;
+    std::transform(answer.begin(), answer.end(), answer.begin(), toupper);
+    if (answer == YES) {
+        dump();
+    }
     std::cout << "Bye!\n";
     exit(0);
 }
@@ -55,6 +78,7 @@ void operate(const std::string& question) {
     } else if (question == ADD) {
         std::cin >> key;
         std::cin >> value;
+
         try {
             table.Insert(key, value);
             std::cout << "You added a {" << key << ", " << value << "} pair\n";
@@ -93,7 +117,8 @@ void operate(const std::string& question) {
             std::cout << e.what() << std::endl;
         }
     } else {
-        std::cout << "You entered something strange. To get help, enter a FAQ\n";
+        std::cout << "You entered something strange. To get help, enter a FAQ\n" << question << std::endl;
+
     }
 }
 
@@ -103,6 +128,7 @@ signed main() {
     faq();
     while (true) {
         std::string question; std::cin >> question;
+
         std::transform(question.begin(), question.end(), question.begin(), toupper);
         operate(question);
     }
