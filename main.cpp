@@ -12,6 +12,7 @@ std::string INC = "INC";
 std::string CHG = "CHG";
 std::string YES = "Y";
 std::string NO = "N";
+std::string DMP = "DMP";
 
 void faq() {
     std::cout << "======================================================================\n"
@@ -23,6 +24,7 @@ void faq() {
                  "To erase a value by key choose ERASE and enter a key\n"
                  "To increment a value by key choose INC and enter a key, than enter a delta\n"
                  "To change a value by key choose CHG and enter a key, than enter a new value\n"
+                 "To create a dump of base choose DMP\n"
                  "To terminate operations choose EXIT\n"
                  "======================================================================\n";
 
@@ -39,7 +41,7 @@ void dump() {
         outStream << key << " " << value << std::endl;
     }
 
-    std::cout << "Move your .dat file to a secure place. It is temporary";
+    std::cout << "Dump created. Move your .dat file to a secure place. It is temporary\n";
 }
 
 void bye() {
@@ -108,6 +110,7 @@ void operate(const std::string& question) {
     } else if (question == CHG) {
         std::cin >> key;
         std::cin >> newValue;
+
         try {
             auto& getValue = table.Get(key);
             std::cout << "You made an {" << key << ", " << getValue << "} -> {" <<
@@ -116,10 +119,13 @@ void operate(const std::string& question) {
         } catch (std::invalid_argument& e) {
             std::cout << e.what() << std::endl;
         }
+    } else if (question == DMP) {
+        dump();
     } else {
-        std::cout << "You entered something strange. To get help, enter a FAQ\n" << question << std::endl;
+        std::cout << "You entered something strange. To get help, enter a FAQ\n";
 
     }
+    std::cin.clear();
 }
 
 
