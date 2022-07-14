@@ -56,13 +56,21 @@ void bye() {
     exit(0);
 }
 
-
+bool checkInt(const std::string& s) {
+    for (auto & c : s) {
+        if (c < '0' || c > '9') {
+            std::cout << "Value/Delta has to be in a integer format\n";
+            return false;
+        }
+    }
+    return true;
+}
 
 void operate(const std::string& question) {
     std::string key;
-    long long value;
-    long long delta;
-    long long newValue;
+    std::string value;
+    std::string delta;
+    std::string newValue;
 
     if (question == FAQ) {
         faq();
@@ -80,9 +88,12 @@ void operate(const std::string& question) {
     } else if (question == ADD) {
         std::cin >> key;
         std::cin >> value;
-
+        if (!checkInt(value)) {
+            return;
+        }
+        auto intValue = std::stoll(value);
         try {
-            table.Insert(key, value);
+            table.Insert(key, intValue);
             std::cout << "You added a {" << key << ", " << value << "} pair\n";
 
         } catch (std::logic_error& e) {
@@ -99,23 +110,30 @@ void operate(const std::string& question) {
     } else if (question == INC) {
         std::cin >> key;
         std::cin >> delta;
+        if (!checkInt(delta)) {
+            return;
+        }
+        auto intDelta = std::stoll(delta);
         try {
             auto& getValue = table.Get(key);
             std::cout << "You made an {" << key << ", " << getValue << "} -> {" <<
-                                            key << ", " << getValue + delta << "} operation\n";
-            getValue += delta;
+                                            key << ", " << getValue + intDelta << "} operation\n";
+            getValue += intDelta;
         } catch (std::invalid_argument& e) {
             std::cout << e.what() << std::endl;
         }
     } else if (question == CHG) {
         std::cin >> key;
         std::cin >> newValue;
-
+        if (!checkInt(newValue)) {
+            return;
+        }
+        auto intNewValue = stoll(newValue);
         try {
             auto& getValue = table.Get(key);
             std::cout << "You made an {" << key << ", " << getValue << "} -> {" <<
-                      key << ", " << newValue << "} operation\n";
-            getValue = newValue;
+                      key << ", " << intNewValue << "} operation\n";
+            getValue = intNewValue;
         } catch (std::invalid_argument& e) {
             std::cout << e.what() << std::endl;
         }
