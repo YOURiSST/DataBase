@@ -1,19 +1,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <set>
-#include <queue>
-#include <deque>
-#include <cmath>
-#include <algorithm>
-#include <numeric>
-#include <map>
 #include <chrono>
 #include <random>
-#include <bitset>
 #include <cassert>
-#include <functional>
-#include <sstream>
 #include <thread>
 #include <optional>
 
@@ -169,7 +159,7 @@ private:
 
     void Rehash() {
         std::vector< std::pair<K, V> > tableInfo;
-        std::cerr << numOfKeys << " ";
+        //std::cerr << numOfKeys << " ";
         for (auto i : *this) {
             tableInfo.emplace_back(i);
         }
